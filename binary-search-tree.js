@@ -223,77 +223,74 @@ class BinarySearchTree {
 
         //two children
         if (c.left && c.right) {
+
+            let candidate;
+
             //left side or right side (to assist in maintaining balance)
             if (this.maxDepth(c.left) > this.maxDepth(c.right)) {
 
-                //find and detach candidate
-                let candidate = this.findMax(c.left);
-                if (candidate.parent.left === candidate) {
-                    candidate.parent.left = null;
-                } else {
-                    candidate.parent.right = null;
-                }
+                //detach candidate from it's parent
+                candidate = this.findMax(c.left);
 
-                //connect candidate's only child
-                if (candidate.left) {
-                    candidate.left.parent = candidate.parent;
+                if (candidate.parent.right === candidate) {
                     candidate.parent.right = candidate.left;
-                }
+                    if (candidate.left) candidate.left.parent = candidate.parent;
 
-                //inherit connections from target node
-                candidate.parent = c.parent;
-                candidate.left = c.left;
-                candidate.right = c.right;
-
-                //connect target node's parent to candidate
-                if (c.parent.left === c) {
-                    c.parent.left = candidate;
                 } else {
-                    c.parent.right = candidate;
+                    candidate.parent.left = candidate.left;
+                    if (candidate.left) candidate.left.parent = candidate.parent;
                 }
-
-                c = null;
-                return deletedNode;
 
             } else {
-                //find and detach candidate
-                let candidate = this.findMin(c.right);
+
+                //detach candidate from it's parent
+                candidate = this.findMin(c.right);
+
                 if (candidate.parent.left === candidate) {
-                    candidate.parent.left = null;
-                } else {
-                    candidate.parent.right = null;
-                }
-
-                //connect candidate's only child
-                if (candidate.right) {
-                    candidate.right.parent = candidate.parent;
                     candidate.parent.left = candidate.right;
+                } else {
+                    candidate.parent.right = candidate.right;
+                    if (candidate.parent.right) candidate.right.parent = candidate.parent;
                 }
+            }
 
-                //inherit connections from target node
-                candidate.parent = c.parent;
-                candidate.left = c.left;
-                candidate.right = c.right;
+            //inherit connections from target node
+            candidate.parent = c.parent;
+            candidate.left = c.left;
+            candidate.right = c.right;
 
+            if (candidate.left) candidate.left.parent = candidate;
+            if (candidate.right) candidate.right.parent = candidate;
 
-                //connect target node's parent to candidate
+            //connect parent's reference
+            if (c.parent) {
                 if (c.parent.left === c) {
                     c.parent.left = candidate;
                 } else {
                     c.parent.right = candidate;
                 }
 
-                c = null;
-                return deletedNode;
+            } else {
+                this.root = candidate;
             }
+
+            c = null;
+            return deletedNode;
         }
     }
+
 
     /** Further Study!
      * isBalanced(): Returns true if the BST is balanced, false otherwise. */
 
     isBalanced() {
-
+        if (this.root === null) return false;
+        if (this.root.left || this.root.right) {
+            if (this.maxDepth(this.root.left) === this.maxDepth(this.root.right)) return true;
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /** Further Study!
@@ -301,38 +298,48 @@ class BinarySearchTree {
      * Otherwise return undefined. */
 
     findSecondHighest() {
-
+        if (this.root === null) return undefined;
+        if (this.maxDepth() === 1) return undefined;
+        const currentNode = this.findMax();
+        const secondHighest = currentNode.left ? currentNode.left.val : currentNode.parent;
+        return secondHighest.val;
     }
 }
 
-const binarySearchTree = new BinarySearchTree();
-binarySearchTree
-    .insert(15)
-    .insert(20)
-    .insert(10)
-    .insert(12)
-    .insert(1)
-    .insert(5)
-    .insert(50)
-    .insert(60)
-    .insert(30)
-    .insert(25)
-    .insert(23)
-    .insert(24)
-    .insert(70);
+// const binarySearchTree = new BinarySearchTree();
+// binarySearchTree
+//     .insert(15)
+//     .insert(20)
+//     .insert(10)
+//     .insert(12)
+//     .insert(1)
+//     .insert(5)
+//     .insert(50)
+//     .insert(60)
+//     .insert(30)
+//     .insert(25)
+//     .insert(23)
+//     .insert(24)
+//     .insert(70);
 
-binarySearchTree.remove(10);
-console.log(binarySearchTree.root.left.val)             //(12); <-- this is incorrect. The idea is to balance the tree by taking from the longer leg. The answer should be (5)
-console.log(binarySearchTree.root.left.left.val)        //(1);
-//console.log(binarySearchTree.root.left.left.right.val)//(5);
+// binarySearchTree.remove(10);
+// console.log(binarySearchTree.root.left.val)             //(12); <-- this is incorrect. The idea is to balance the tree by taking from the longer leg. The answer should be (5)
+// console.log(binarySearchTree.root.left.left.val)        //(1);
+// //console.log(binarySearchTree.root.left.left.right.val)//(5);
 
-binarySearchTree.remove(50);
-console.log(binarySearchTree.root.right.val)            //(20);
-console.log(binarySearchTree.root.right.right.val)      //(60); <-- this is incorrect. The idea is to balance the tree by taking from the longer leg. The answer should be (23)
-//console.log(binarySearchTree.root.right.right.left.val)//(30);
+// console.log('>>>>> here')
+// binarySearchTree.remove(50);
+// console.log(binarySearchTree.root.right.val)            //(20);
+// console.log(binarySearchTree.root.right.right.val)      //(60); <-- this is incorrect. The idea is to balance the tree by taking from the longer leg. The answer should be (30)
+// console.log(binarySearchTree.root.right.right.left)
 
-
-
+// const binarySearchTree2 = new BinarySearchTree();
+// binarySearchTree2
+//     .insert(15)
+//     .insert(20)
+//     .insert(10)
+//     .insert(12);
+// console.log(binarySearchTree2.findSecondHighest())      //(15);
 
 
 // binarySearchTree.insert(15);
